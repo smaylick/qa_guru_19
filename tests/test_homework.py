@@ -11,6 +11,11 @@ def test_get_user():
     assert response.json()["data"]["first_name"] == "Janet"
 
 
+def test_not_found_404():
+    response = requests.get(f"{base_url}unknown/23")
+    assert response.status_code == 404
+
+
 def test_create_user():
     name = "Anton"
     job = "QA"
@@ -45,29 +50,38 @@ def test_get_list_users():
         "page": 2
     })
     body = response.json()
-    with open("files/users_list.json") as file:
+    with open("../schemas/users_list.json") as file:
         validate(body, schema=json.loads(file.read()))
 
 
-def test_create_user_fail():
-    name = "Anton"
-    job = "QA"
-    response = requests.post(f"{base_url}users", json={
-        "name": name,
-        "job": job
-    })
-    assert response.status_code == 201
-    assert response.json()["name"] == job
-    assert response.json()["job"] == name
-
-
-def test_get_error_status_code():
-    response = requests.get(f"{base_url}users/2")
-    assert response.status_code == 400
-
-
-def test_get_invalid_user():
-    response = requests.get(f"{base_url}users/2")
+def test_get_list_resource():
+    response = requests.get(f"{base_url}unknown")
     body = response.json()
-    with open("files/only_user.json") as file:
+    with open("../schemas/list_resource.json") as file:
         validate(body, schema=json.loads(file.read()))
+
+
+def test_successful_register():
+    response = requests.post(f"{base_url}register", json={
+        "email": "eve.holt@reqres.in",
+        "password": "pistol"
+    })
+    body = response.json()
+    with open("../schemas/response_successful_register.json") as file:
+        validate(body, schema=json.loads(file.read()))
+
+
+def test_unsuccessful_register():
+    response = requests.post(f"{base_url}register", json={
+        "email": "sydney@fife"
+    })
+    assert response.status_code == 400
+    assert response.json()["error"] == "Missing password"
+
+
+def test_unsuccessful_login():
+    response = requests.post(f"{base_url}login", json={
+        "email": "peter@klaven"
+    })
+    assert response.status_code == 400
+    assert response.json()["error"] == "Missing password"
