@@ -1,7 +1,8 @@
 import json
 from jsonschema import validate
-
 import requests
+
+from utils.python_utils import load_schema
 
 base_url = "https://reqres.in/api/"
 
@@ -68,6 +69,13 @@ def test_successful_register():
     })
     body = response.json()
     with open("../schemas/response_successful_register.json") as file:
+        validate(body, schema=json.loads(file.read()))
+
+
+def test_get_single_user():
+    response = requests.get(f"{base_url}users/2")
+    body = response.json()
+    with open("../schemas/only_user.json") as file:
         validate(body, schema=json.loads(file.read()))
 
 
