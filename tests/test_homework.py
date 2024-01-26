@@ -2,7 +2,7 @@ import json
 from jsonschema import validate
 import requests
 
-from utils.python_utils import load_schema
+from utils.utils import load_schema
 
 base_url = "https://reqres.in/api/"
 
@@ -51,15 +51,19 @@ def test_get_list_users():
         "page": 2
     })
     body = response.json()
-    with open("../schemas/users_list.json") as file:
-        validate(body, schema=json.loads(file.read()))
+    schema_path = load_schema("users_list.json")
+    with open(schema_path) as file:
+        schema = json.load(file)
+    validate(body, schema=schema)
 
 
 def test_get_list_resource():
     response = requests.get(f"{base_url}unknown")
     body = response.json()
-    with open("../schemas/list_resource.json") as file:
-        validate(body, schema=json.loads(file.read()))
+    schema_path = load_schema("list_resource.json")
+    with open(schema_path) as file:
+        schema = json.load(file)
+    validate(body, schema=schema)
 
 
 def test_successful_register():
@@ -68,15 +72,19 @@ def test_successful_register():
         "password": "pistol"
     })
     body = response.json()
-    with open("../schemas/response_successful_register.json") as file:
-        validate(body, schema=json.loads(file.read()))
+    schema_path = load_schema("response_successful_register.json")
+    with open(schema_path) as file:
+        schema = json.load(file)
+    validate(body, schema=schema)
 
 
 def test_get_single_user():
     response = requests.get(f"{base_url}users/2")
     body = response.json()
-    with open("../schemas/only_user.json") as file:
-        validate(body, schema=json.loads(file.read()))
+    schema_path = load_schema("only_user.json")
+    with open(schema_path) as file:
+        schema = json.load(file)
+    validate(body, schema=schema)
 
 
 def test_unsuccessful_register():
